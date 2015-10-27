@@ -1,0 +1,129 @@
+package create_branch
+
+import scala.concurrent.duration._
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef._
+
+class RecordedSimulation extends Simulation {
+
+	val httpProtocol = http
+		.baseURL("http://52.88.81.144")
+		.inferHtmlResources()
+
+	val headers_0 = Map("Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
+	val headers_28 = Map("Accept" -> "text/html")
+
+	val headers_29 = Map(
+		"Accept" -> "application/json",
+		"Origin" -> "http://52.88.81.144",
+		"x-requested-with" -> "XMLHttpRequest")
+
+    val uri1 = "http://52.88.81.144"
+    val auth_token = regex("""<input name="authenticity_token" type="hidden" value="(.*?)" />""").saveAs("auth_token")
+    val branches_token = regex(""".*?action="\/first-org\/rails\/branches.*?<input name="authenticity_token" type="hidden" value="(.*?)" />""").saveAs("branches_token")
+    //val sha = regex("""<input type="hidden" name="commit" class="js-commit-oid" value="(.*?)">""").saveAs("sha")
+    //.formParam("authenticity_token", session => session("auth_token").validate[String])
+   //action="/first-org/rails/branches
+
+	val scn = scenario("RecordedSimulation")
+		.exec(http("request_0")
+			.get("/login")
+            .check(auth_token)
+			.headers(headers_0)
+			.resources(http("request_1")
+			.post(uri1 + "/session")
+			.headers(headers_0)
+			.formParam("utf8", "✓")
+            .formParam("authenticity_token", session => session("auth_token").validate[String])
+			//.formParam("authenticity_token", "xDk6Uj8jJcBLQkHV84a7yZNDUvu3NcflNFghtRacT1xEJeY5bi7QVnyiaKxHgEVlq4VpdCCEje/eokA43kSfbA==")
+			.formParam("login", "user1")
+			.formParam("password", "passworD1")
+			.formParam("return_to", "http://52.88.81.144/"),
+   /*         http("request_2")
+			.get(uri1 + "/avatars/u/4?s=40"),
+            http("request_3")
+			.get(uri1 + "/avatars/u/8?s=60"),
+            http("request_4")
+			.get(uri1 + "/avatars/u/6?s=60"),
+            http("request_5")
+			.get(uri1 + "/avatars/u/5?s=60"),
+            http("request_6")
+			.get(uri1 + "/avatars/u/7?s=60"),
+            http("request_7")
+			.get(uri1 + "/avatars/u/24?s=60"),
+            http("request_8")
+			.get(uri1 + "/avatars/u/10?s=60"),
+            http("request_9")
+			.get(uri1 + "/avatars/u/32?s=60"),
+            http("request_10")
+			.get(uri1 + "/avatars/u/9?s=60"),
+            http("request_11")
+			.get(uri1 + "/avatars/u/19?s=60"),
+            http("request_12")
+			.get(uri1 + "/avatars/u/38?s=40"),
+            http("request_13")
+			.get(uri1 + "/avatars/u/18?s=32"),
+            http("request_14")
+			.get(uri1 + "/avatars/u/28?s=60"),
+            http("request_15")
+			.get(uri1 + "/avatars/u/19?s=32"),
+            http("request_16")
+			.get(uri1 + "/avatars/u/6?s=32"),
+            http("request_17")
+			.get(uri1 + "/avatars/u/11?s=60"),
+            http("request_18")
+			.get(uri1 + "/avatars/u/18?s=60"),
+            http("request_19")
+			.get(uri1 + "/avatars/u/31?s=60"),
+            http("request_20")
+			.get(uri1 + "/avatars/u/11?s=32"),
+            http("request_21")
+			.get(uri1 + "/avatars/u/23?s=60"),
+            http("request_22")
+			.get(uri1 + "/avatars/u/7?s=32"),
+            http("request_23")
+			.get(uri1 + "/avatars/u/12?s=60"),
+            http("request_24")
+			.get(uri1 + "/avatars/u/12?s=32"),
+            http("request_25")
+			.get(uri1 + "/avatars/u/37?s=60"),
+            http("request_26")
+			.get(uri1 + "/avatars/u/8?s=32"),*/
+            http("request_27")
+			.get(uri1 + "/first-org/rails")
+			.headers(headers_0),
+            http("request_28")
+			.get(uri1 + "/first-org/rails/show_partial?partial=tree%2Frecently_touched_branches_list")
+            .check(branches_token)
+			.headers(headers_28),
+            //http("request_29")
+			//.get(uri1 + "/first-org/rails/issues/counts")
+			//.headers(headers_29),
+            http("request_30")
+			.post(uri1 + "/first-org/rails/branches")
+            .check(branches_token)
+			.headers(headers_0)
+			.formParam("utf8", "✓")
+            .formParam("authenticity_token", session => session("branches_token").validate[String])
+			//.formParam("authenticity_token", "+uCmG2wewXwnqluKSokQn+C1bp5Hgb7BmDMBY2GcBQ1KI1CEVXCHhePpk4qHxCDim92Q6pgBuDKsRXmdFMwqCQ==")
+			.formParam("name", "test55")
+			.formParam("branch", "master")
+			.formParam("path", ""),
+            http("request_31")
+			.get(uri1 + "/first-org/rails/show_partial?partial=tree%2Frecently_touched_branches_list")
+			.headers(headers_28),
+            http("request_32")
+			.get(uri1 + "/first-org/rails/issues/counts")
+			.headers(headers_29)))
+            //http("request_33")
+			//.post(uri1 + "/logout")
+			//.headers(headers_0)
+            //.check(auth_token)
+			//.formParam("utf8", "✓")
+            //.formParam("authenticity_token", session => session("auth_token").validate[String])))
+			//.formParam("authenticity_token", "YDNNQCvLR2rYFFHD/RX4kCC/fIDnlg/XTH06Ab0xJ4niH651ST3fOgZSBkiltOgdPViUPCpmmovGLfoXGCk4aA==")))
+	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+}

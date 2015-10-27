@@ -1,0 +1,89 @@
+package create_branch2
+
+import scala.concurrent.duration._
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef._
+
+class RecordedSimulation extends Simulation {
+
+	val httpProtocol = http
+		.baseURL("http://52.88.81.144")
+		.inferHtmlResources()
+
+	val headers_0 = Map("Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                   "Accept-Encoding" -> "identity")
+
+	val headers_30 = Map(
+		"Accept" -> "application/json",
+		"Origin" -> "http://52.88.81.144",
+		"x-requested-with" -> "XMLHttpRequest")
+
+	val headers_31 = Map("Accept" -> "text/html")
+
+    val uri1 = "http://52.88.81.144"
+    val auth_token = regex("""<input name="authenticity_token" type="hidden" value="(.*?)" />""").saveAs("auth_token")
+    val branches_token = regex("""<input name="authenticity_token" type="hidden" value="(.*?)" /></div>""").saveAs("branches_token")
+
+	val scn = scenario("RecordedSimulation")
+		.exec(http("GET_LOGIN")
+			.get("/login")
+			//.resources(http("GET_SESSION")
+			//.headers(headers_0))
+            //.get(uri1 + "/assets/octicons/octicons/octicons-d1f6e5a79e67d6de3908e18e13796b707592b476d1d770     c1dea0d3b30ae9bbc6.woff")
+            .check(auth_token))
+        .exec(http("GET_SESSION")
+			.post("/session")
+			//.post(uri1 + "/session")
+			.headers(headers_0)
+			.formParam("utf8", "✓")
+            .formParam("authenticity_token", session => session("auth_token").validate[String])
+			//.formParam("authenticity_token", "b30op85DWXlmuBb3TCUjzJwfFCOxT+jqiIUbIFW3yqHDgBsOBgLhQ22+noEQ0E1MHpCeihS1PhdtLj5i3cGPdw==")
+			.formParam("login", "user1")
+			.formParam("password", "passworD1")
+			.formParam("return_to", "http://52.88.81.144/")
+            )
+        .exec(http("GET_DOCKER")
+			.get(uri1 + "/first-org/docker")
+            .check(currentLocation.saveAs("loc"))
+            .check(branches_token)
+			.headers(headers_0),
+            http("request_28")
+			.get(uri1 + "/first-org/docker/raw/master/docs/static_files/docker-logo-compressed.png"),
+            http("request_29")
+			.get(uri1 + "/raw/first-org/docker/master/docs/static_files/docker-logo-compressed.png?token=AAAABDQSDd07NfrMs1FobXONAA8r8aQnks5WMFY-wA%3D%3D"),
+            http("request_30")
+			.get(uri1 + "/first-org/docker/issues/counts")
+			.headers(headers_30),
+            http("request_31")
+			.get(uri1 + "/first-org/docker/contributors_size")
+			.headers(headers_31),
+            http("GET_BRANCHES")
+			.post(uri1 + "/first-org/docker/branches")
+            .check(auth_token)
+			.headers(headers_0)
+			.formParam("utf8", "✓")
+            .formParam("authenticity_token", session => session("auth_token").validate[String])
+			//.formParam("authenticity_token", "odI8lbwYpA5ge7sxbLlv8IH26ibpczEM3B8tiC07peclWUJHQm/FSlLnZVfN8/qAt3Cu/t2ZNfPyezI61My5Jw==")
+			.formParam("name", "test48")
+			.formParam("branch", "master")
+			.formParam("path", ""),
+            http("request_33")
+			.get(uri1 + "/first-org/docker/raw/test44/docs/static_files/docker-logo-compressed.png"),
+            http("request_34")
+			.get(uri1 + "/first-org/docker/issues/counts")
+			.headers(headers_30),
+            http("request_35")
+			.get(uri1 + "/raw/first-org/docker/test44/docs/static_files/docker-logo-compressed.png?token=AAAABMPYPZBbpWk4NbVmFR5Q1q1jPiiEks5WMFZNwA%3D%3D"))
+            .exec(
+                session => {
+                     println("session before login: " + session)
+                     println("------branches authenticity_token: " + session("branches_token").as[String])
+                     println("------authenticity_token: " + session("auth_token").as[String])
+                     println("------location: " + session("loc").as[String])
+                     session
+         })
+
+	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+}
