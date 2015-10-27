@@ -104,6 +104,7 @@ class CommitNewFile extends Simulation {
                 session
        })
 
+	//setUp(scn.inject(rampUsers(5) over(30 seconds)).protocols(httpProtocol))
 	//setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
-	setUp(scn.inject(splitUsers(100) into(rampUsers(10) over(10 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
+	setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
 }

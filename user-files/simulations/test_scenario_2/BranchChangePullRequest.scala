@@ -51,8 +51,8 @@ class BranchChangePullRequest extends Simulation {
 			.post("/session")
 			.formParam("utf8", "✓")
             .formParam("authenticity_token", session => session("auth_token").validate[String])
-			.formParam("login", "user10")
-			//.formParam("login", "${userName}")
+			//.formParam("login", "user10")
+			.formParam("login", "${userName}")
 			.formParam("password", "passworD1"))
 
         .exec((session: Session) => { // use a simple action
@@ -136,5 +136,8 @@ class BranchChangePullRequest extends Simulation {
                  session
         })
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+    //setUp(scn.inject(rampUsers(5) over(30 seconds)).protocols(httpProtocol))
+	//setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+    //setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
+    setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
 }

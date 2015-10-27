@@ -50,5 +50,8 @@ class DownloadRepos extends Simulation {
 			.get("/first-org/${repoName}/archive/master.zip")
 			.check(md5.is("${md5}")))
 
-	setUp(scn.inject(atOnceUsers(20))).protocols(httpProtocol)
+     //setUp(scn.inject(rampUsers(5) over(30 seconds)).protocols(httpProtocol))
+	//setUp(scn.inject(atOnceUsers(20))).protocols(httpProtocol)
+    //setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
+    setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
 }

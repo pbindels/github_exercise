@@ -95,5 +95,8 @@ class CommentPullRequest extends Simulation {
 			.formParam("issue", "1")
 			.formParam("comment[body]", randomString(20)))
 
-	setUp(scn.inject(atOnceUsers(40))).protocols(httpProtocol)
+    //setUp(scn.inject(rampUsers(5) over(30 seconds)).protocols(httpProtocol))
+	//setUp(scn.inject(atOnceUsers(40))).protocols(httpProtocol)
+    //setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
+    setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
 }
