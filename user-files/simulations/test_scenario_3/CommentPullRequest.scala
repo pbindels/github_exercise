@@ -9,8 +9,18 @@ import scala.util.Random
 
 class CommentPullRequest extends Simulation {
 
+    //Get cmd args
+    val endpoint = System.getProperty("endpoint")
+    val users = Integer.getInteger("users",1)
+    val rampusers = Integer.getInteger("rampusers",1)
+    val ramptime = Integer.getInteger("ramptime",1)
+    val pwd = System.getProperty("pass")
+    println("Testing endpoint: " + endpoint)
+    println("Testing rampusers: " + rampusers)
+    println("Testing ramptime: " + ramptime)
+
 	val httpProtocol = http
-		.baseURL("http://52.88.81.144")
+		.baseURL(endpoint)
 		.inferHtmlResources()
 
 	val headers_1 = Map(
@@ -23,7 +33,7 @@ class CommentPullRequest extends Simulation {
 		"X-Timeline-Last-Modified" -> "Fri, 16 Oct 2015 22:54:07 GMT")
 
 	val headers_7 = Map(
-		"Origin" -> "http://52.88.81.144",
+		"Origin" -> endpoint, 
 		"X-Requested-With" -> "XMLHttpRequest")
 
 	val headers_8 = Map(
@@ -33,7 +43,7 @@ class CommentPullRequest extends Simulation {
 		"X-Requested-With" -> "XMLHttpRequest",
 		"X-Timeline-Last-Modified" -> "Fri, 16 Oct 2015 22:54:07 GMT")
 
-    val uri1 = "http://52.88.81.144"
+    val uri1 = endpoint 
     val auth_token = regex("""<input name="authenticity_token" type="hidden" value="(.*?)" />""").saveAs("auth_token")
     val user_feeder = csv("users.csv").random
 
@@ -48,14 +58,12 @@ class CommentPullRequest extends Simulation {
 
 
 	val scn = scenario("CommentPullRequest")
-		.exec(http("request_0")
+		.exec(http("GET_LOGIN")
 			.get("/login")
             .check(auth_token))
 
-		.pause(6)
+		.pause(1)
         .feed(user_feeder)
-
-        //val comment = randomString(20)
 
         .exec( 
             session => {
@@ -63,31 +71,31 @@ class CommentPullRequest extends Simulation {
                 session
         })
 
-		.exec(http("request_2")
+		.exec(http("POST_SESSION_LOGIN")
 			.post("/session")
 			.formParam("utf8", "✓")
 			.formParam("authenticity_token", session => session("auth_token").validate[String]) 
 			.formParam("login", session => session("userName").validate[String])
-			.formParam("password", "passworD1")
-			.formParam("return_to", "http://52.88.81.144/"))
-		.pause(3)
+			.formParam("password", pwd) 
+			.formParam("return_to", endpoint))
+		.pause(1)
 
-		.exec(http("request_3")
+		.exec(http("GET_PULLS")
 			.get("/pulls")
             .check(auth_token))
 		.pause(1)
 
-		.exec(http("request_4")
+		.exec(http("GET_ONE_PULL")
 			.get("/first-org/rails/pull/1")
             .check(auth_token))
 		.pause(1)
 
-		.exec(http("request_7")
+		.exec(http("GET_SUGGESTIONS")
 			.get("/first-org/rails/suggestions/pull_request/2")
 			.headers(headers_7))
-		.pause(5)
+		.pause(1)
 
-		.exec(http("request_8")
+		.exec(http("POST_PULL_COMMENT")
 			.post("/first-org/rails/pull/1/comment")
 			.headers(headers_8)
 			.formParam("utf8", "✓")
@@ -95,8 +103,9 @@ class CommentPullRequest extends Simulation {
 			.formParam("issue", "1")
 			.formParam("comment[body]", randomString(20)))
 
+    setUp(scn.inject(rampUsers(rampusers) over(ramptime seconds)).protocols(httpProtocol))
     //setUp(scn.inject(rampUsers(5) over(30 seconds)).protocols(httpProtocol))
 	//setUp(scn.inject(atOnceUsers(40))).protocols(httpProtocol)
     //setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
-    setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
+    //setUp(scn.inject(splitUsers(100) into(rampUsers(30) over(60 seconds)) separatedBy(atOnceUsers(10))).protocols(httpProtocol))
 }
