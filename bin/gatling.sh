@@ -17,6 +17,15 @@
 
 USER_ARGS="$@"
 
+echo "Enter number of ramp users:"
+read rampusers
+
+echo "Enter ramp up time (seconds):"
+read  ramptime
+
+echo "Enter password"
+read -s password 
+
 OLDDIR=`pwd`
 BIN_DIR=`dirname $0`
 cd "${BIN_DIR}/.." && DEFAULT_GATLING_HOME=`pwd` && cd "${OLDDIR}"
@@ -28,7 +37,7 @@ export GATLING_HOME GATLING_CONF
 
 echo "GATLING_HOME is set to ${GATLING_HOME}"
 
-JAVA_OPTS="-server -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms512M -Xmx512M -Xmn100M -XX:+HeapDumpOnOutOfMemoryError -XX:+AggressiveOpts -XX:+OptimizeStringConcat -XX:+UseFastAccessorMethods -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false ${JAVA_OPTS}"
+JAVA_OPTS="-server -XX:+UseThreadPriorities -XX:ThreadPriorityPolicy=42 -Xms512M -Xmx512M -Xmn100M -XX:+HeapDumpOnOutOfMemoryError -XX:+AggressiveOpts -XX:+OptimizeStringConcat -XX:+UseFastAccessorMethods -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false -Drampusers=$rampusers -Dramptime=$ramptime -Dendpoint=http://52.88.34.54 -Dpass=$password ${JAVA_OPTS}"
 COMPILER_OPTS="$JAVA_OPTS -Xss10M"
 
 # Setup classpaths
